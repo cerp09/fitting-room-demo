@@ -1,0 +1,114 @@
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D 試衣間 Demo</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #f4f4f4; text-align: center; }
+    canvas { width: 100%; height: 400px; display: block; }
+    .controls { padding: 20px; }
+    select, input { padding: 6px; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h2>🧵 客製化 3D 試衣間</h2>
+
+  <div class="controls">
+    <div>
+      <label for="style">版型：</label>
+      <select id="style">
+        <option>圓領</option>
+        <option>V領</option>
+        <option>U領</option>
+        <option>一般排扣</option>
+        <option>全排扣</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="fabric">布料：</label>
+      <select id="fabric">
+        <option>棉質</option>
+        <option>橫紋透氣排汗</option>
+        <option>橫紋快速吸汗</option>
+        <option>格紋透氣排汗</option>
+        <option>格紋快速吸汗</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="color">顏色 / 布料：</label>
+      <select id="color">
+        <option value="#F8B500">中華色</option>
+        <option value="#F19483">年代配色</option>
+        <option value="#7BB662">草綠色</option>
+        <option value="#8B0000">波爾多紅</option>
+        <option value="#1A1A1A">哥特黑</option>
+        <option value="#D7C49E">卡其色</option>
+        <option value="texture">野戰迷彩</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="size">尺寸：</label>
+      <select id="size">
+        <option>S</option>
+        <option>M</option>
+        <option>L</option>
+        <option>XL</option>
+        <option>2XL</option>
+        <option>3XL</option>
+        <option>4XL</option>
+        <option>5XL</option>
+      </select>
+    </div>
+  </div>
+
+  <canvas id="scene"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script>
+    const canvas = document.getElementById('scene');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, 400);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#f4f4f4');
+
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / 400, 0.1, 1000);
+    camera.position.z = 5;
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 2).normalize();
+    scene.add(light);
+
+    const geometry = new THREE.CylinderGeometry(1, 1, 2.5, 32);
+    const material = new THREE.MeshPhongMaterial({ color: '#ffffff' });
+    const model = new THREE.Mesh(geometry, material);
+    scene.add(model);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      model.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    const colorSelect = document.getElementById('color');
+    const textureLoader = new THREE.TextureLoader();
+    const textureURL = 'camouflage_texture.jpg'; // 本地部署時請確保圖片存在同目錄
+
+    colorSelect.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'texture') {
+        material.map = textureLoader.load(textureURL);
+        material.color.set('#ffffff');
+      } else {
+        material.map = null;
+        material.color.set(val);
+      }
+      material.needsUpdate = true;
+    });
+  </script>
+</body>
+</html>
